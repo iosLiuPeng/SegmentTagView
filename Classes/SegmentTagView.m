@@ -58,27 +58,28 @@
 #pragma mark - Subjoin
 - (void)viewConfig
 {
-
     // 默认值
     
     // 默认颜色
-    _nomarlColor = [UIColor blackColor];
+    if (_nomarlColor == nil) {
+        _nomarlColor = [UIColor blackColor];
+    }
     
     // 选中颜色
-    _selectColor = [UIColor yellowColor];
-    _sliderView.backgroundColor = _selectColor;
+    if (_selectColor == nil) {
+        _selectColor = [UIColor yellowColor];
+        _sliderView.backgroundColor = _selectColor;
+    }
     
     // 标题字体大小
-    _titleFont = [UIFont systemFontOfSize:17.0];
+    if (_titleFont == nil) {
+        _titleFont = [UIFont systemFontOfSize:17.0];
+    }
     
-    // 最小间距
-    _minSpace = 10.0;
-    _stackView.spacing = _minSpace;
-    
-    // 占父视图宽度的最小比例
-    _minWidthProportion = 0.15;
-    // 占父视图宽度的最大比例
-    _maxWidthProportion = 0.5;
+    if (_minSpace < 10) {
+        _minSpace = 10;
+        _stackView.spacing = _minSpace;
+    }
 }
 
 #pragma mark - Private
@@ -103,6 +104,7 @@
         btn.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
         btn.titleLabel.font = _titleFont;
         [btn addTarget:self action:@selector(clickedButton:) forControlEvents:UIControlEventTouchUpInside];
+        [btn setContentCompressionResistancePriority:1000 forAxis:UILayoutConstraintAxisHorizontal];
         [_arrBtns addObject:btn];
         
         [_stackView insertArrangedSubview:btn atIndex:_stackView.subviews.count - 1];
@@ -115,6 +117,10 @@
 // 更新按钮宽度约束
 - (void)updateBtnsConstraint
 {
+    if ((_minWidthProportion <= 0 && _maxWidthProportion <= 0) || _maxWidthProportion < _maxWidthProportion) {
+        return;
+    }
+    
     // 先移除旧的约束
     for (UIButton *btn in _arrBtns) {
         [btn removeConstraints:btn.constraints];
@@ -122,12 +128,24 @@
 
     // 添加约束
     for (UIButton *btn in _arrBtns) {
-        NSLayoutConstraint *minWidth = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_minWidthProportion constant:0];
-        NSLayoutConstraint *maxWidth = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationLessThanOrEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_maxWidthProportion constant:0];
-        NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_minWidthProportion constant:0];
-        width.priority = 900;
-        [btn setContentCompressionResistancePriority:990 forAxis:UILayoutConstraintAxisHorizontal];
-        [_scrollView addConstraints:@[minWidth, maxWidth, width]];
+        NSMutableArray *muarr = [[NSMutableArray alloc] init];
+        if (_maxWidthProportion > 0) {
+            NSLayoutConstraint *maxWidth = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationLessThanOrEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_maxWidthProportion constant:0];
+            [muarr addObject:maxWidth];
+        }
+        
+        if (_minWidthProportion > 0) {
+            NSLayoutConstraint *minWidth = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_minWidthProportion constant:0];
+            [muarr addObject:minWidth];
+            
+            NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_minWidthProportion constant:0];
+            width.priority = 900;
+            [muarr addObject:width];
+            
+            [btn setContentCompressionResistancePriority:990 forAxis:UILayoutConstraintAxisHorizontal];
+        }
+        
+        [_scrollView addConstraints:muarr];
     }
 
     [self setNeedsLayout];
@@ -184,13 +202,6 @@
             weakSelf.scrollView.contentOffset = CGPointMake(weakSelf.scrollView.contentOffset.x + offset, 0);
         }];
     }];
-    
-    // 回调
-    if (animation) {
-        if (_selectIndexBlock) {
-            _selectIndexBlock(_currentIndex);
-        }
-    }
 }
 
 #pragma mark - Action
@@ -202,6 +213,11 @@
         _currentIndex = index;
         
         [self selectIndex:index animation:YES];
+        
+        // 回调
+        if (_selectIndexBlock) {
+            _selectIndexBlock(_currentIndex);
+        }
     }
 }
 
