@@ -104,7 +104,8 @@
         btn.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
         btn.titleLabel.font = _titleFont;
         [btn addTarget:self action:@selector(clickedButton:) forControlEvents:UIControlEventTouchUpInside];
-        [btn setContentCompressionResistancePriority:1000 forAxis:UILayoutConstraintAxisHorizontal];
+        [btn setContentCompressionResistancePriority:998 forAxis:UILayoutConstraintAxisHorizontal];
+        [btn setContentHuggingPriority:998 forAxis:UILayoutConstraintAxisHorizontal];
         [_arrBtns addObject:btn];
         
         [_stackView insertArrangedSubview:btn atIndex:_stackView.subviews.count - 1];
@@ -139,10 +140,8 @@
             [muarr addObject:minWidth];
             
             NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_minWidthProportion constant:0];
-            width.priority = 900;
+            width.priority = 999;
             [muarr addObject:width];
-            
-            [btn setContentCompressionResistancePriority:990 forAxis:UILayoutConstraintAxisHorizontal];
         }
         
         [_scrollView addConstraints:muarr];
