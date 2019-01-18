@@ -20,8 +20,6 @@ IB_DESIGNABLE
 @property (nonatomic, assign) IBInspectable CGFloat minWidthProportion; ///< item占父视图宽度的最小比例
 @property (nonatomic, assign) IBInspectable CGFloat maxWidthProportion; ///< item占父视图宽度的最大比例 
 
-@property (nonatomic, copy) IBInspectable NSString *previewText; ///< 预览文案（当设置了标题数组时，会自动消失）
-
 @property (nonatomic, strong) NSArray *arrTitle;    ///< 标题数组
 
 @property (nonatomic, assign) NSInteger currentIndex;   ///< 当前序号

@@ -82,6 +82,14 @@
     }
 }
 
+/// 预览时调用，程序实际运行时不调用
+- (void)prepareForInterfaceBuilder
+{
+    self.minWidthProportion = 0.1;
+    self.maxWidthProportion = 0.5;
+    self.arrTitle = @[@"预览", @"预览文案", @"在程序运行时不会执行，预览文案预览文案", @"预览文案，在程", @"预览文案，在程序运行时不会执行预览文案，在程序运行时不会执行"];
+}
+
 #pragma mark - Private
 /// 创建按钮
 - (void)createButtons
@@ -140,7 +148,7 @@
             [muarr addObject:minWidth];
             
             NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:btn attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_scrollView attribute:NSLayoutAttributeWidth multiplier:_minWidthProportion constant:0];
-            width.priority = 999;
+            width.priority = 900;
             [muarr addObject:width];
         }
         
@@ -291,16 +299,6 @@
     _currentIndex = currentIndex;
     
     [self selectIndex:currentIndex animation:YES];
-}
-
-- (void)setPreviewText:(NSString *)previewText
-{
-    _previewText = previewText;
-    
-    // 预览文案
-    if (_previewText.length > 0) {
-        self.arrTitle = @[_previewText, _previewText, _previewText, _previewText, _previewText, _previewText];
-    }
 }
 
 @end
